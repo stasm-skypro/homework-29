@@ -4,6 +4,7 @@
 
 import logging
 
+from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -67,6 +68,15 @@ class ProductListView(ListView):
         user = self.request.user
         context["is_product_moderator"] = user.groups.filter(name="Product Moderators").exists()
         return context
+
+    def get_queryset(self):
+        """Возвращает список продуктов, используя кэш."""
+        queryset = cache.get("product_list")
+
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set("product_list", queryset, 60*15)
+        return queryset
 
 
 @method_decorator(cache_page(60*15), name='dispatch')
