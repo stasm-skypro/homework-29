@@ -98,6 +98,7 @@
              style="color: #c0c9d1;">Удалить</a>
           {% endif %}
         </div>
+
         {% if user.is_authenticated and is_product_moderator %}
         <div class="text-center">
           <a href="{% url 'catalog:product_moderator_update' product.pk %}" class="p-2 btn btn-dark-link" role="button"
@@ -105,38 +106,6 @@
         </div>
         {% endif %}
 
-        <!-- Вариант 2 -->
-        <!--        <div class="btn-group">-->
-        <!--          {% if user.is_authenticated %}-->
-        <!--          <a href="{% url 'catalog:product_detail' product.pk %}" class="p-2 btn btn-dark-link" role="button"-->
-        <!--             style="color: #34373a;">Подробнее</a>-->
-
-        <!--          {% if user == product.owner %}-->
-        <!--          <a href="{% url 'catalog:product_update' product.pk %}" class="p-2 btn btn-dark-link" role="button"-->
-        <!--             style="color: #34373a;">Редактировать</a>-->
-        <!--          <a href="{% url 'catalog:product_delete' product.pk %}" class="p-2 btn btn-dark-link" role="button"-->
-        <!--             style="color: #34373a;">Удалить</a>-->
-
-        <!--          {% elif is_product_moderator %}-->
-        <!--          <a href="{% url 'catalog:product_delete' product.pk %}" class="p-2 btn btn-dark-link" role="button"-->
-        <!--             style="color: #34373a;">Удалить</a>-->
-
-        <!--          {% else %}-->
-        <!--          <a href="#" class="p-2 btn btn-secondary-link" tabindex="-1" role="button" aria-disabled="true"-->
-        <!--             style="color: #c0c9d1;">Редактировать</a>-->
-        <!--          <a href="#" class="p-2 btn btn-secondary-link" tabindex="-1" role="button" aria-disabled="true"-->
-        <!--             style="color: #c0c9d1;">Удалить</a>-->
-        <!--          {% endif %}-->
-
-        <!--          {% else %}-->
-        <!--          <a href="#" class="p-2 btn btn-secondary-link" tabindex="-1" role="button" aria-disabled="true"-->
-        <!--             style="color: #c0c9d1;">Подробнее</a>-->
-        <!--          <a href="#" class="p-2 btn btn-secondary-link" tabindex="-1" role="button" aria-disabled="true"-->
-        <!--             style="color: #c0c9d1;">Редактировать</a>-->
-        <!--          <a href="#" class="p-2 btn btn-secondary-link" tabindex="-1" role="button" aria-disabled="true"-->
-        <!--             style="color: #c0c9d1;">Удалить</a>-->
-        <!--          {% endif %}-->
-        <!--        </div>-->
       </div>
       <br/>
       <!--  -->

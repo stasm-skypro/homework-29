@@ -5,7 +5,8 @@
 import logging
 
 from django.urls import reverse_lazy
-from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -68,6 +69,7 @@ class ProductListView(ListView):
         return context
 
 
+@method_decorator(cache_page(60*15), name='dispatch')
 class ProductDetailView(LoginRequiredMixin, DetailView):
     """Определяет отображение детализации (характеристик) продукта."""
 
