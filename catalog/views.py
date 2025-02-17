@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 from catalog.forms import CategoryForm, ProductForm, ProductModeratorForm
 from catalog.mixins import OwnerRequiredMixin  # Импортируем кастомный миксин для проверки владельца
 from catalog.models import Category, Product
+from catalog.services import ProductService
 
 load_dotenv()
 
@@ -38,8 +39,8 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     """Определяет отображение добавления категории."""
 
     model = Category
-    context_object_name = "category"
     form_class = CategoryForm
+    context_object_name = "category"
     success_url = reverse_lazy("catalog:product_list")
 
     def form_valid(self, form):
@@ -53,6 +54,14 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         logger.warning("Ошибка при создании категории продукта: %s" % form.errors)
         return super().form_invalid(form)
 
+
+
+class CategoryListView(ListView):
+    """Определяет отображение списка категорий."""
+
+    model = Category
+    form_class = CategoryForm
+    context_object_name = "category_list"
 
 # ---- Определяем набор CRUD-операций для модели Product ----
 #
@@ -75,11 +84,11 @@ class ProductListView(ListView):
 
         if not queryset:
             queryset = super().get_queryset()
-            cache.set("product_list", queryset, 60*15)
+            cache.set("product_list", queryset, 60 * 15)
         return queryset
 
 
-@method_decorator(cache_page(60*15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class ProductDetailView(LoginRequiredMixin, DetailView):
     """Определяет отображение детализации (характеристик) продукта."""
 
@@ -90,6 +99,7 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         """Проверяет количество просмотров статьи и отправляет уведомление администратору."""
         self.object = super().get_object(queryset)
         self.object.views_counter += 1
+        print(self.object.views_counter)
 
         # Отправлять уведомление администратору, если количество просмотров превысило 100
         if self.object.views_counter >= 100:
@@ -98,7 +108,6 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
             logger.info("Информационное сообщение отправлено на адрес %s." % "stasm226@gmail.com")
 
         self.object.save()
-
         return self.object
 
     def send_info_email(self, user_email):
@@ -130,7 +139,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
 
 
-class ProductUpdateView(LoginRequiredMixin, OwnerRequiredMixin,  UpdateView):
+class ProductUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     """Определяет отображение обновления продукта."""
 
     model = Product
@@ -189,4 +198,20 @@ class ProductDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
         logger.info("Продукт '%s' успешно удалён." % product.product)
         return super().delete(request, *args, **kwargs)
 
+
+class ProductByCategoryListView(ListView):
+    """Представление для вывода списка товаров по категории, отсортированных по просмотрам."""
+
+    model = Product
+    template_name = "catalog/product_by_category.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        """Использует сервисный класс для получения и сортировки товаров."""
+        category_id = self.kwargs["pk"]
+        if category_id is None:
+            raise ValueError("category_id не передан в URL!")
+
+        self.category_id = category_id
+        return ProductService(category_id).get_products()
 

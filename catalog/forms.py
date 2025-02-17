@@ -50,6 +50,18 @@ class CategoryForm(StyledFormMixin, forms.ModelForm):
         return cleaned_data
 
 
+class CategoryListForm(StyledFormMixin, forms.Form):
+    """Форма для вывода списка всех категорий товаров."""
+
+    class Meta:
+        model = Category
+        fields = "__all__"
+        labels = {
+            "name": "Наименование категории",
+            "description": "Описание",
+        }
+
+
 class ProductForm(StyledFormMixin, forms.ModelForm):
     """
     Форма для ввода данных о продукте.

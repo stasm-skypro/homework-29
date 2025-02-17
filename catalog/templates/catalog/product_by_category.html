@@ -1,0 +1,35 @@
+<!-- product_by_category.html -->
+{% extends 'base.html' %}
+{% block title %} Skystore {% endblock %}
+{% block content %}
+{% include 'header.html' %}
+{% include 'navbar.html' %}
+
+<h5>Товары в категории: {{ category_id }}</h5>
+
+{% if products %}
+<ul>
+  {% for product in products %}
+  <li>
+    <strong>{{ product.product }}</strong> — {{ product.price }} руб.
+    <br>
+    <small>Просмотров: {{ product.views_counter }}</small>
+    <br>
+    {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.product }}" width="150">
+    {% else %}
+    <p>Нет изображения</p>
+    {% endif %}
+  </li>
+  <hr>
+  {% endfor %}
+</ul>
+{% else %}
+<p>В этой категории пока нет товаров.</p>
+{% endif %}
+
+<div>
+  <a href="{% url 'catalog:category_list' %}" class="btn btn-primary" role="button">Вернуться</a>
+</div>
+
+{% endblock %}
