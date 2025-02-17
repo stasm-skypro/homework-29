@@ -88,7 +88,7 @@ class ProductListView(ListView):
         return queryset
 
 
-# @method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class ProductDetailView(LoginRequiredMixin, DetailView):
     """Определяет отображение детализации (характеристик) продукта."""
 
@@ -206,12 +206,18 @@ class ProductByCategoryListView(ListView):
     template_name = "catalog/product_by_category.html"
     context_object_name = "products"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.category_id = None
+
     def get_queryset(self):
         """Использует сервисный класс для получения и сортировки товаров."""
         category_id = self.kwargs["pk"]
         if category_id is None:
+            logger.error("category_id не передан в URL!")
             raise ValueError("category_id не передан в URL!")
 
         self.category_id = category_id
+        logger.info("ID категории продукта: %s успешно передан." % category_id)
         return ProductService(category_id).get_products()
 
